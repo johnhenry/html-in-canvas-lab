@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>HTML-in-Canvas Lab — Nested Effects</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a class="brand" href="#top"><span class="brand-mark">HIC</span><span>HTML-in-Canvas Lab</span></a>
+      <div class="nav-links">
+        <a class="active" href="#experiment">Experiments</a>
+        <a href="#findings">Findings</a>
+        <a href="https://github.com/johnhenry/html-in-canvas-lab">Source</a>
+      </div>
+    </nav>
+    <main>
+      <header id="top" class="hero">
+        <p class="eyebrow">Experimental web platform research</p>
+        <h1>HTML-in-Canvas Lab</h1>
+        <p class="lede">
+          Small, focused tests for rendering live DOM through Canvas 2D—and finding the edges of the emerging API.
+        </p>
+      </header>
+
+      <div class="experiment-nav" aria-label="Experiment navigation">
+        <a class="experiment-link active" href="#experiment">
+          <span>001</span><strong>Nested effects</strong><small>Current experiment</small>
+        </a>
+        <div class="experiment-link upcoming">
+          <span>002</span><strong>Coming next</strong><small>Another boundary test</small>
+        </div>
+      </div>
+
+      <section id="experiment" class="stage" aria-labelledby="demo-title">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">Experiment 001</p>
+            <h2 id="demo-title">Nested canvas effects</h2>
+            <p class="stage-summary">Three HTML-in-Canvas layers, with independently routed post-processing at every boundary.</p>
+          </div>
+          <span id="support" class="status">Checking browser…</span>
+        </div>
+
+        <fieldset id="effect-controls" class="effect-controls">
+          <legend>Effect routing</legend>
+          <div class="effect-grid effect-grid-head" aria-hidden="true">
+            <span>Panel</span><span>Pixelate</span><span>Fisheye</span><span>Psychedelic</span>
+          </div>
+          <div class="effect-grid">
+            <strong>Outer</strong>
+            <label><input type="checkbox" data-layer="outer" data-effect="pixelate"><span>Pixelate</span></label>
+            <label><input type="checkbox" data-layer="outer" data-effect="fisheye"><span>Fisheye</span></label>
+            <label><input type="checkbox" data-layer="outer" data-effect="psychedelic" checked><span>Psychedelic</span></label>
+
+            <strong>Middle</strong>
+            <label><input type="checkbox" data-layer="middle" data-effect="pixelate"><span>Pixelate</span></label>
+            <label><input type="checkbox" data-layer="middle" data-effect="fisheye" checked><span>Fisheye</span></label>
+            <label><input type="checkbox" data-layer="middle" data-effect="psychedelic"><span>Psychedelic</span></label>
+
+            <strong>Inner</strong>
+            <label><input type="checkbox" data-layer="inner" data-effect="pixelate" checked><span>Pixelate</span></label>
+            <label><input type="checkbox" data-layer="inner" data-effect="fisheye"><span>Fisheye</span></label>
+            <label><input type="checkbox" data-layer="inner" data-effect="psychedelic"><span>Psychedelic</span></label>
+          </div>
+          <button id="clear-effects" class="clear-effects" type="button">Clear all effects</button>
+        </fieldset>
+
+        <canvas id="outer-canvas" class="canvas outer" content="drawable" layoutsubtree>
+          <article id="outer-card" class="card card-outer" drawable>
+            <span class="level">Layer 1 · psychedelic color separation</span>
+            <h3>The outer canvas colors everything beneath it.</h3>
+            <p>If the inner layers split into shifting colors, their pixels crossed this boundary.</p>
+
+            <canvas id="middle-canvas" class="canvas middle" content="drawable" layoutsubtree>
+              <article id="middle-card" class="card card-middle" drawable>
+                <span class="level">Layer 2 · cursor fisheye</span>
+                <h3>Move your pointer across this card.</h3>
+                <p>The lens should bend the already-pixelated canvas below it.</p>
+
+                <canvas id="inner-canvas" class="canvas inner" content="drawable" layoutsubtree>
+                  <article id="inner-card" class="card card-inner" drawable>
+                    <span class="level">Layer 3 · pixelation</span>
+                    <h3><span id="counter">0</span> clicks survived the trip.</h3>
+                    <button id="clicker" type="button">Test interactivity</button>
+                    <small id="interaction-mode" class="interaction-mode">Checking interaction mode…</small>
+                  </article>
+                </canvas>
+              </article>
+            </canvas>
+          </article>
+        </canvas>
+
+        <div id="fallback" class="fallback" hidden>
+          <strong>This browser does not expose <code>drawElementImage()</code>.</strong>
+          <span>The button is still live ordinary DOM, but its clicks do not test canvas hit-testing.</span>
+          <span>Open in Chrome Canary, enable <code>chrome://flags/#canvas-draw-element</code>, and reload.</span>
+        </div>
+
+        <ol class="diagnostics" aria-label="Canvas effect legend">
+          <li><i class="swatch outer-swatch"></i><strong>Outer:</strong> animated RGB split</li>
+          <li><i class="swatch middle-swatch"></i><strong>Middle:</strong> pointer fisheye</li>
+          <li><i class="swatch inner-swatch"></i><strong>Inner:</strong> chunky pixelation</li>
+        </ol>
+      </section>
+
+      <p class="answer">
+        The demo paints from the deepest canvas outward. If the fisheye bends chunky pixels and the outer layer
+        color-separates the result, effects are crossing both recursive canvas boundaries.
+      </p>
+
+      <section id="findings" class="findings" aria-labelledby="findings-title">
+        <p class="eyebrow">Observed October 23, 2026</p>
+        <h2 id="findings-title">Findings</h2>
+        <div class="finding-grid">
+          <article class="finding positive">
+            <span class="finding-status">Works</span>
+            <h3>Effects survive nesting</h3>
+            <p>Pixelation, localized distortion, and animated color processing compose across three nested Canvas 2D boundaries. Each parent captures the processed bitmap produced by its child.</p>
+          </article>
+          <article class="finding caution">
+            <span class="finding-status">Likely bug</span>
+            <h3>DOM clicks stop working</h3>
+            <p>Once HTML-in-Canvas is active, the deepest real DOM button renders but does not receive pointer clicks through the ancestor canvases. The ordinary-DOM fallback remains interactive.</p>
+          </article>
+          <article class="finding neutral">
+            <span class="finding-status">Interpretation</span>
+            <h3>Painting and hit-testing diverge</h3>
+            <p>Recursive bitmap composition appears functional, while hit-test geometry is not propagated through the same nested canvas chain. This looks like an implementation bug or an unimplemented edge of the experimental API.</p>
+          </article>
+        </div>
+        <p class="method-note">Tested with the experimental HTML-in-Canvas implementation enabled in Chromium. The API is under active development; behavior may change.</p>
+      </section>
+    </main>
+    <script type="module" src="index.mjs"></script>
+  </body>
+</html>
