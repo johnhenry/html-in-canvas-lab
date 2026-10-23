@@ -22,11 +22,27 @@ npm start
 
 Open `http://localhost:4173`.
 
-To activate the experiment, use a compatible Chromium build and enable:
+## Activate HTML-in-Canvas in Chrome
 
-```text
-chrome://flags/#canvas-draw-element
+HTML-in-Canvas is still experimental and may not be present in ordinary Chrome Stable. Chrome Canary is the most reliable option.
+
+1. Install or open a recent Chrome Canary build.
+2. Paste `chrome://flags/#canvas-draw-element` into the address bar.
+3. Set **Enable the new drawElement API for Canvas** to **Enabled**.
+4. Paste `chrome://flags/#enable-experimental-web-platform-features` into the address bar.
+5. Set **Experimental Web Platform features** to **Enabled**.
+6. Click **Relaunch** when Chrome prompts you.
+7. Return to the demo and reload the page.
+
+Chrome does not allow websites to open `chrome://` URLs directly, so the addresses must be pasted into the address bar.
+
+When activation succeeds, the badge above the experiment reads **API active** and the effect-routing controls become available. You can also verify support in DevTools:
+
+```js
+typeof CanvasRenderingContext2D.prototype.drawElementImage === 'function'
 ```
+
+The expression should return `true`. If it returns `false`, the current Chrome build does not expose the API or the flags have not taken effect.
 
 The site provides a readable ordinary-DOM fallback in browsers without `drawElementImage()`.
 
